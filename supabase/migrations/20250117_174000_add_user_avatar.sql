@@ -1,0 +1,4 @@
+-- ADD AVATAR URL TO USERS
+
+ALTER TABLE public.users
+ADD COLUMN IF NOT EXISTS avatar_url TEXT;

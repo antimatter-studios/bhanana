@@ -1,175 +1,123 @@
-import { getCopy, languages } from "../translations";
+import { getCopy } from "../translations";
 import Link from "next/link";
-import { ThemeToggle } from "../components/theme-toggle";
+import { SiteHeader } from "@/components/site-header";
+import { HeroSlider } from "@/components/hero-slider";
 
-function Stat({ label }: { label: string }) {
+export default function Home({ searchParams }: { searchParams: { lang?: string } }) {
+  const { lang, text } = getCopy(searchParams?.lang);
+
+  const heroSlides = [
+    {
+      kicker: "Bhanana • Nepal",
+      title: text.hero.title,
+      subtitle: text.hero.subtitle,
+      cta: { label: text.cta.donate, href: "/contact" },
+      secondaryCta: { label: text.cta.volunteer, href: "/contact" },
+      stats: [
+        text.stats.confidence,
+        text.stats.belonging,
+        text.stats.continuation,
+        text.stats.girls,
+      ],
+      imageUrl: "https://images.unsplash.com/photo-1509099836639-18ba02e1c5c9?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Happy children enjoying activities outdoors",
+    },
+    {
+      kicker: "Community impact",
+      title: "Safe spaces for every child",
+      subtitle: "Warm, inclusive environments that nurture play, learning, and wellbeing.",
+      cta: { label: "Join our programs", href: "/contact" },
+      stats: [text.stats.confidence, text.stats.belonging],
+      imageUrl: "https://images.unsplash.com/photo-1464375117522-1311d6a5b81f?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Children playing together in a community space",
+    },
+    {
+      kicker: "Learning together",
+      title: "Moments of discovery",
+      subtitle: "Hands-on activities that spark curiosity and teamwork.",
+      cta: { label: "Explore programs", href: "/about" },
+      imageUrl: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Kids learning together at a table",
+    },
+    {
+      kicker: "Creative play",
+      title: "Art, crafts, and imagination",
+      subtitle: "Spaces where children express themselves through color and shape.",
+      cta: { label: "See workshops", href: "/contact" },
+      imageUrl: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Children painting and drawing",
+    },
+    {
+      kicker: "Healthy movement",
+      title: "Active days, happy kids",
+      subtitle: "Playgrounds and activities that build confidence and resilience.",
+      cta: { label: "Join a session", href: "/contact" },
+      imageUrl: "https://images.unsplash.com/photo-1495305379050-64540d6ee95d?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Kids running outdoors",
+    },
+    {
+      kicker: "Community smiles",
+      title: "Joy in every gathering",
+      subtitle: "Moments that celebrate belonging and togetherness.",
+      cta: { label: "Volunteer with us", href: "/contact" },
+      imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Smiling child portrait",
+    },
+    {
+      kicker: "Outdoor fun",
+      title: "Nature and play",
+      subtitle: "Time outside to explore, laugh, and grow.",
+      cta: { label: "Plan a visit", href: "/contact" },
+      imageUrl: "https://images.unsplash.com/photo-1492724441997-5dc8650f734b?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Children playing on grass",
+    },
+    {
+      kicker: "Safe spaces",
+      title: "Inclusive environments",
+      subtitle: "Everyone is welcome and supported.",
+      cta: { label: "Support the mission", href: "/contact" },
+      imageUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Children in a friendly classroom",
+    },
+    {
+      kicker: "Bright futures",
+      title: "Confidence for tomorrow",
+      subtitle: "Building self-belief through play and learning.",
+      cta: { label: "Donate now", href: "/contact" },
+      imageUrl: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Smiling child looking at camera",
+    },
+    {
+      kicker: "Shared stories",
+      title: "Listening and learning",
+      subtitle: "Moments of connection between mentors and kids.",
+      cta: { label: "Get involved", href: "/contact" },
+      imageUrl: "https://images.unsplash.com/photo-1520854221050-0f4caff449fb?auto=format&fit=crop&w=2000&q=80",
+      imageAlt: "Mentor and children reading together",
+    },
+  ];
+
   return (
-    <div className="rounded-xl bg-white/70 px-4 py-3 shadow-sm ring-1 ring-amber-200/80">
-      <p className="text-sm font-semibold text-amber-900">{label}</p>
-    </div>
-  );
-}
+    <div className="min-h-screen bg-linear-to-b from-(--bg-gradient-from) to-(--bg-gradient-to) text-foreground">
+      <SiteHeader lang={lang} labels={text.nav} />
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ lang?: string }>;
-}) {
-  const { lang, text } = getCopy((await searchParams)?.lang);
+      <main className="flex flex-col gap-12">
+        <HeroSlider slides={heroSlides} />
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-[var(--bg-gradient-from)] to-[var(--bg-gradient-to)] text-[var(--text-primary)]">
-      <header className="sticky top-0 z-10 backdrop-blur bg-[color-mix(in_srgb,var(--surface) 85%,transparent)] border-b border-[var(--border)]">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <div className="text-lg font-semibold tracking-tight">
-            Bhanana
-          </div>
-          <nav className="hidden gap-6 text-sm font-medium text-[var(--text-primary)] md:flex">
-            <a href="#home" className="hover:text-[var(--accent)]">
-              {text.nav.home}
-            </a>
-            <a href="#about" className="hover:text-[var(--accent)]">
-              {text.nav.about}
-            </a>
-            <a href="#blog" className="hover:text-[var(--accent)]">
-              {text.nav.blog}
-            </a>
-            <a href="#contact" className="hover:text-[var(--accent)]">
-              {text.nav.contact}
-            </a>
-            <a href="#admin" className="hover:text-[var(--accent)]">
-              {text.nav.admin}
-            </a>
-          </nav>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <div className="flex items-center gap-1 rounded-full bg-[var(--surface)]/80 px-2 py-1 ring-1 ring-[var(--border)]">
-              {languages.map((l) => (
-                <Link
-                  key={l}
-                  href={`/?lang=${l}`}
-                  className={`px-2 py-1 text-xs font-semibold uppercase tracking-wide ${
-                    lang === l
-                      ? "rounded-full bg-[var(--accent)]/15 text-[var(--accent-strong)]"
-                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-                  }`}
-                >
-                  {l}
-                </Link>
-              ))}
-            </div>
-            <a
-              href="#donate"
-              className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[var(--accent-strong)]"
-            >
-              {text.cta.donate}
-            </a>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-12" id="home">
-        <section className="grid gap-8 rounded-3xl bg-[var(--surface)]/90 p-8 shadow-sm ring-1 ring-[var(--border)] md:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-4">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
-              Bhanana • Nepal
-            </p>
-            <h1 className="text-3xl font-bold leading-tight md:text-4xl">
-              {text.hero.title}
-            </h1>
-            <p className="text-lg leading-8 text-[var(--text-secondary)]">
-              {text.hero.subtitle}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span className="inline-flex items-center rounded-full bg-[var(--pill)] px-3 py-1 text-sm font-semibold text-[var(--accent-strong)] ring-1 ring-[var(--border)]">
-                {text.hero.impact}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <a
-                id="donate"
-                className="rounded-full bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[var(--accent-strong)]"
-                href="#contact"
-              >
-                {text.cta.donate}
-              </a>
-              <a
-                className="rounded-full border border-[var(--border)] px-5 py-3 text-sm font-semibold text-[var(--text-primary)] hover:bg-[var(--surface-soft)]"
-                href="#contact"
-              >
-                {text.cta.volunteer}
-              </a>
-            </div>
-          </div>
-          <div className="grid gap-3">
-            <Stat label={text.stats.confidence} />
-            <Stat label={text.stats.belonging} />
-            <Stat label={text.stats.continuation} />
-            <Stat label={text.stats.girls} />
-          </div>
-        </section>
-
-        <section
-          id="about"
-          className="grid gap-8 rounded-3xl bg-[var(--surface)]/90 p-8 shadow-sm ring-1 ring-[var(--border)] md:grid-cols-2"
-        >
-          <div className="space-y-3">
-            <h2 className="text-2xl font-bold">{text.mission.title}</h2>
-            <p className="leading-7 text-[var(--text-secondary)]">{text.mission.body}</p>
-          </div>
-          <div className="space-y-3">
-            <h2 className="text-2xl font-bold">{text.approach.title}</h2>
-            <p className="leading-7 text-[var(--text-secondary)]">{text.approach.body}</p>
-          </div>
-        </section>
-
-        <section
-          id="blog"
-          className="rounded-3xl bg-[var(--surface)]/90 p-8 shadow-sm ring-1 ring-[var(--border)]"
-        >
+        <section className="mx-auto w-full max-w-[1400px] rounded-2xl bg-(--surface)/90 p-8 shadow-sm ring-1 ring-(--border)">
           <h2 className="text-2xl font-bold">{text.blog.title}</h2>
           <p className="mt-2 leading-7 text-[var(--text-secondary)]">{text.blog.body}</p>
-          <div className="mt-4 grid gap-3 text-sm text-[var(--text-primary)]">
-            {text.impactTiers.items.map((item) => (
-              <div
-                key={item.amount}
-                className="flex items-start gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3"
-              >
-                <span className="min-w-[64px] rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">
-                  {item.amount}
-                </span>
-                <p className="leading-6 text-[var(--text-secondary)]">{item.text}</p>
-              </div>
-            ))}
+          <div className="mt-4">
+            <Link
+              className="rounded-md border border-(--border) px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-(--surface-soft)"
+              href="/blog"
+            >
+              Go to blog
+            </Link>
           </div>
-        </section>
-
-        <section
-          id="contact"
-          className="rounded-3xl bg-[var(--surface)]/90 p-8 shadow-sm ring-1 ring-[var(--border)]"
-        >
-          <h2 className="text-2xl font-bold">{text.contact.title}</h2>
-          <p className="mt-2 leading-7 text-[var(--text-secondary)]">{text.contact.body}</p>
-          <div className="mt-4 inline-flex rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white">
-            {text.contact.email}
-          </div>
-        </section>
-
-        <section
-          id="admin"
-          className="rounded-3xl bg-[var(--surface)]/90 p-8 shadow-sm ring-1 ring-[var(--border)]"
-        >
-          <h2 className="text-2xl font-bold">{text.admin.title}</h2>
-          <p className="mt-2 leading-7 text-[var(--text-secondary)]">{text.admin.body}</p>
         </section>
       </main>
-
-      <footer className="border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--surface) 90%,transparent)] py-8">
-        <div className="mx-auto flex max-w-5xl flex-col gap-2 px-6 text-sm text-[var(--text-secondary)] md:flex-row md:items-center md:justify-between">
-          <p>Bhanana • Nepal • Holistic play, mental health, and safe spaces</p>
-          <p className="text-xs text-[var(--text-secondary)]">Built with Next.js, Tailwind, Supabase-ready.</p>
-        </div>
-      </footer>
     </div>
   );
 }
+

@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { getCopy } from "@/translations";
-import { UserService, type UserRow } from "@/services/user-service";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BlogService, type BlogPost } from "@/services/blog-service";
 
 export const revalidate = 0;
-const NOW_MS = Number(new Date());
 
-async function loadUsers(): Promise<UserRow[]> {
-  return UserService.list();
+async function loadPosts(): Promise<BlogPost[]> {
+  return BlogService.list();
 }
 
 const Pill = ({ children }: { children: React.ReactNode }) => (
@@ -17,8 +15,8 @@ const Pill = ({ children }: { children: React.ReactNode }) => (
   </span>
 );
 
-export default async function AdminUsersPage({ searchParams }: { searchParams?: { lang?: string } }) {
-  const users = await loadUsers();
+export default async function AdminBlogPage({ searchParams }: { searchParams?: { lang?: string } }) {
+  const posts = await loadPosts();
   const { lang, text } = getCopy(searchParams?.lang);
 
   return (
@@ -44,8 +42,18 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
                 className="group flex items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-(--surface-soft)"
               >
                 <div className="flex items-center gap-3">
-                  <span className="h-2 w-2 rounded-full bg-(--accent)" />
+                  <span className="h-2 w-2 rounded-full bg-(--border)" />
                   <span>Users</span>
+                </div>
+                <span className="text-(--text-secondary) transition group-hover:text-(--accent)">→</span>
+              </Link>
+              <Link
+                href="/admin/blog"
+                className="group flex items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold text-foreground transition hover:bg-(--surface-soft)"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="h-2 w-2 rounded-full bg-(--accent)" />
+                  <span>Blog</span>
                 </div>
                 <span className="text-(--text-secondary) transition group-hover:text-(--accent)">→</span>
               </Link>
@@ -57,50 +65,34 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
               <div className="space-y-2">
                 <p className="text-xs uppercase tracking-[0.25em] text-(--text-secondary)">Admin</p>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold">Users</h1>
-                  <Pill>{users.length} total</Pill>
+                  <h1 className="text-3xl font-bold">Blog</h1>
+                  <Pill>{posts.length} posts</Pill>
                 </div>
-                <p className="text-sm text-(--text-secondary)">
-                  Manage accounts, roles, and credentials for the control panel.
-                </p>
+                <p className="text-sm text-(--text-secondary)">Manage blog posts for the site.</p>
               </div>
               <Link
-                href="/admin/users/new"
+                href="/admin/blog/new"
                 className="inline-flex items-center rounded-full bg-(--accent) px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-(--accent-strong)"
               >
-                + New user
+                + New post
               </Link>
             </header>
-
-            <div className="flex flex-wrap gap-2 text-xs">
-              <Pill>Total: {users.length}</Pill>
-              <Pill>
-                Admins: {users.filter((u) => u.role.toLowerCase().includes("admin")).length}
-              </Pill>
-              <Pill>
-                Updated (24h):{" "}
-                {users.filter((u) => {
-                  const updated = new Date(u.updated_at).getTime();
-                  return NOW_MS - updated < 24 * 60 * 60 * 1000;
-                }).length}
-              </Pill>
-            </div>
 
             <section className="rounded-2xl border border-(--border) bg-background/80 shadow-sm ring-1 ring-(--border)">
               <div className="flex flex-col gap-3 border-b border-(--border) px-4 py-3 text-sm text-(--text-secondary) sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <span className="h-2 w-2 rounded-full bg-(--accent)" />
-                  <span className="font-semibold text-foreground">User directory</span>
+                  <span className="font-semibold text-foreground">Post directory</span>
                   <span className="hidden rounded-full bg-(--surface-soft) px-2 py-1 text-[11px] font-semibold sm:inline-flex">
-                    {users.length} records
+                    {posts.length} records
                   </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <span className="rounded-full bg-(--surface-soft) px-3 py-1 font-semibold text-(--text-secondary)">
-                    {users.length > 0 ? "Active" : "Empty"}
+                    {posts.length > 0 ? "Active" : "Empty"}
                   </span>
                   <span className="rounded-full border border-(--border) px-3 py-1 font-semibold text-(--text-secondary)">
-                    Sorted by created_at
+                    Sorted by published_at
                   </span>
                 </div>
               </div>
@@ -109,42 +101,27 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
                 <table className="w-full border-collapse text-sm">
                   <thead className="bg-(--surface) text-(--text-secondary)">
                     <tr>
-                      <th className="px-4 py-3 text-left font-semibold">User</th>
-                      <th className="px-4 py-3 text-left font-semibold">Role</th>
-                      <th className="px-4 py-3 text-left font-semibold">Updated</th>
+                      <th className="px-4 py-3 text-left font-semibold">Title</th>
+                      <th className="px-4 py-3 text-left font-semibold">Author</th>
+                      <th className="px-4 py-3 text-left font-semibold">Published</th>
+                      <th className="px-4 py-3 text-left font-semibold">Tags</th>
                       <th className="px-4 py-3 text-right font-semibold">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-(--border) bg-background/50">
-                    {users.map((user) => (
-                      <tr key={user.id} className="text-foreground transition hover:bg-(--surface-soft)">
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-9 w-9 border border-(--border)">
-                              {user.avatar_url ? (
-                                <AvatarImage src={user.avatar_url} alt={`${user.display_name || user.username} avatar`} />
-                              ) : (
-                                <AvatarFallback>{(user.display_name || user.username || "?").slice(0, 2).toUpperCase()}</AvatarFallback>
-                              )}
-                            </Avatar>
-                            <div className="leading-tight">
-                              <div className="font-semibold">{user.display_name}</div>
-                              <div className="font-mono text-[11px] text-(--text-secondary)">{user.username}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className="inline-flex items-center gap-2 rounded-full border border-(--border) bg-(--surface-soft) px-3 py-1 text-xs font-semibold">
-                            <span className="h-2 w-2 rounded-full bg-(--accent)" />
-                            {user.role}
-                          </span>
+                    {posts.map((post) => (
+                      <tr key={post.id} className="text-foreground transition hover:bg-(--surface-soft)">
+                        <td className="px-4 py-3 font-semibold">{post.title}</td>
+                        <td className="px-4 py-3 text-(--text-secondary)">{post.author}</td>
+                        <td className="px-4 py-3 text-(--text-secondary)">
+                          {new Date(post.published_at).toLocaleString()}
                         </td>
                         <td className="px-4 py-3 text-(--text-secondary)">
-                          {new Date(user.updated_at).toLocaleString()}
+                          {post.tags?.length ? post.tags.join(", ") : "—"}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <Link
-                            href={`/admin/users/${user.id}`}
+                            href={`/admin/blog/${post.id}`}
                             className="inline-flex items-center gap-2 rounded-full border border-(--border) px-3 py-1 text-xs font-semibold text-foreground transition hover:-translate-y-0.5 hover:bg-(--surface-soft)"
                           >
                             Edit
@@ -152,13 +129,13 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
                         </td>
                       </tr>
                     ))}
-                    {users.length === 0 && (
+                    {posts.length === 0 && (
                       <tr>
                         <td
                           colSpan={5}
                           className="px-4 py-8 text-center text-(--text-secondary)"
                         >
-                          No users yet. Create the first admin above.
+                          No posts yet. Create the first post above.
                         </td>
                       </tr>
                     )}
