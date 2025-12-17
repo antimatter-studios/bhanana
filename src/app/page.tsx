@@ -10,12 +10,12 @@ function Stat({ label }: { label: string }) {
   );
 }
 
-export default function Home({
+export default async function Home({
   searchParams,
 }: {
-  searchParams: { lang?: string };
+  searchParams: Promise<{ lang?: string }>;
 }) {
-  const { lang, text } = getCopy(searchParams?.lang);
+  const { lang, text } = getCopy((await searchParams)?.lang);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[var(--bg-gradient-from)] to-[var(--bg-gradient-to)] text-[var(--text-primary)]">
